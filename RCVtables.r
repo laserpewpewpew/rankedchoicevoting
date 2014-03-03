@@ -61,12 +61,6 @@ olog.pos.step1 <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + ne
 olog.pos.step2 <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization, data=mydata, Hess = TRUE)
 olog.pos.final <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization + city_satisfaction, data=mydata, Hess = TRUE)
 
-library(stargazer)
-stargazer(log.pos.base, log.pos.step1, log.pos.step2, log.pos.final, olog.pos.base, olog.pos.step1,olog.pos.step2, olog.pos.final,
-          title="Positive Campaigning", no.space=TRUE,
-          dep.var.labels=c("Dichotomous Less Negative Campaigning", "Ordinal Less Negative Campaigning"),
-          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
-
 ##################
 # RCV Preference #
 ##################
@@ -76,13 +70,6 @@ log.pref.base <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed 
 log.pref.step1 <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting, data=mydata, family="binomial")
 log.pref.step2 <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization, data=mydata, family="binomial")
 log.pref.final <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization + city_satisfaction, data=mydata, family="binomial")
-
-library(stargazer)
-stargazer(log.pref.base, log.pref.step1, log.pref.step2, log.pref.final, title="Logistic Regression of Preference for RCV System", 
-          no.space=TRUE,
-          dep.var.labels=c("Use RCV In Other Cities"),
-          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
-
 
 ##################
 # Less Criticism #
@@ -100,12 +87,6 @@ olog.crit.base <- polr(ocrit.f ~ rcv_voting + newwhite + age + newedu + employed
 olog.crit.step1 <- polr(ocrit.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting, data=mydata, Hess = TRUE)
 olog.crit.step2 <- polr(ocrit.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization, data=mydata, Hess = TRUE)
 olog.crit.final <- polr(ocrit.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization + city_satisfaction, data=mydata, Hess = TRUE)
-
-library(stargazer)
-stargazer(log.crit.base, log.crit.step1, log.crit.step2, log.crit.final, olog.crit.base, olog.crit.step1,
-          olog.crit.step2, olog.crit.final, title="Less Criticism Between Candidates", no.space=TRUE,
-          dep.var.labels=c("Dichotomous Less Criticism", "Ordinal Less Criticism"),
-          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
 
 #########################
 # Campaign Satisfaction #
@@ -130,12 +111,6 @@ olog.sat.step1 <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + n
 olog.sat.step2 <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization, data=mydata, Hess = TRUE)
 olog.sat.final <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting + mobilization + city_satisfaction, data=mydata, Hess = TRUE)
 
-library(stargazer)
-stargazer(log.sat.base, log.sat.step1, log.sat.step2, log.sat.final, olog.sat.base, olog.sat.step1,
-          olog.sat.step2, olog.sat.final, title="Satisfaction with Conduct of Campaigns", no.space=TRUE,
-          dep.var.labels=c("Dichotomous Satisfaction", "Ordinal Satisfaction"),
-          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
-
 #################
 # Null Findings #
 #################
@@ -151,8 +126,47 @@ log.praise <- glm(praise ~ rcv_voting + newwhite + age + newedu + employed + mar
 olog.info <- polr(useful_information.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
 olog.cand <- polr(candidate_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + interesting, data=mydata, Hess = TRUE)
 
+#######################
+# Create LaTeX Tables #
+#######################
 library(stargazer)
+
+stargazer(olog.pos.base, olog.pos.step1, olog.pos.step2, olog.pos.final,
+          title="Ordered Logit of Positive Campaigning", align=TRUE,
+          dep.var.labels=c("Ordinal Less Negative Campaigning"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
+stargazer(log.pos.base, log.pos.step1, log.pos.step2, log.pos.final,
+          title="Logistic Regression of Positive Campaigning", align=TRUE,
+          dep.var.labels=c("Dichotomous Less Negative Campaigning"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
 stargazer(log.fair, log.praise, olog.info, olog.cand,
-          title="Null and Negative Findings", no.space=TRUE,
+          title="Null and Negative Findings", align=TRUE,
           dep.var.labels=c("Fairness", "Candidate Praise", "Useful Info.", "Candidate Choice Satisfaction"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
+stargazer(log.crit.base, log.crit.step1, log.crit.step2, log.crit.final,
+          title="Logistic Regression of Less Criticism Between Candidates", align=TRUE,
+          dep.var.labels=c("Dichotomous Less Criticism"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
+stargazer(olog.crit.base, olog.crit.step1,olog.crit.step2, olog.crit.final, 
+          title="Ordered Logit of Less Criticism Between Candidates", align=TRUE,
+          dep.var.labels=c("Ordinal Less Criticism"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
+stargazer(log.sat.base, log.sat.step1, log.sat.step2, log.sat.final, 
+          title="Logistic Regression of Satisfaction with Conduct of Campaigns", align=TRUE,
+          dep.var.labels=c("Dichotomous Satisfaction"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
+stargazer(olog.sat.base, olog.sat.step1, olog.sat.step2, olog.sat.final, 
+          title="Ordered Logit of Satisfaction with Conduct of Campaigns", align=TRUE,
+          dep.var.labels=c("Ordinal Satisfaction"),
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
+
+stargazer(log.pref.base, log.pref.step1, log.pref.step2, log.pref.final, 
+          title="Logistic Regression of Preference for RCV System", align=TRUE,
+          dep.var.labels=c("Use RCV In Other Cities"),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
