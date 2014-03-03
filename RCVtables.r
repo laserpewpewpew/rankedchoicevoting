@@ -67,12 +67,29 @@ stargazer(log.pos.base, log.pos.step1, log.pos.step2, log.pos.final, olog.pos.ba
           dep.var.labels=c("Dichotomous Less Negative Campaigning", "Ordinal Less Negative Campaigning"),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Interesting", "Mobilization", "City Satisfaction"))
 
-stargazer(fit.final, nbfit.final, olr.final, title="Robust Results Across Dependent Variable Treatment", align=TRUE, 
-          dep.var.labels=c("Political Participation", "Participation Factor"),
-          covariate.labels=c("Religious Motivation", "Mostly Religious Cmty.", "Age", "Political Knowledge", "Political Interest", "Married", "Income", "Education", "Religious Motivation * Mostly Rel. Cmty."),
-          omit.stat=c("LL","ser","f", "theta"),
-          no.space=FALSE
-)
+# Predicted probabilities
+
+newdata <- read.csv("predprobsdata.csv")
+newdata <- cbind(newdata, predict(log.pos.final, newdata))
+
+head(newdata)
+
+lnewdat <- melt(newdata, id.vars = c("rcv_voting", "white", "age", "newedu", "employed", "married", "democrat", "republican", "electoral_winner", "interesting", "mobilization", "city_satisfaction"), variable.name = "Less Negative Campaigns",
+                value.name ="Probability")
+head(lnewdat)
+
+lnewdat$rcv_voting.f[lnewdat$rcv_voting==1] <- "RCV Cities"
+lnewdat$rcv_voting.f[lnewdat$rcv_voting==0] <- "Non-RCV Cities"
+
+# ggplot(lnewdat, aes(x = polmotbyrel, y = Probability, colour = Participation)) + geom_line() +
+#  xlab("Religious Motivation of Politics") +
+#  facet_grid (. ~ mostlyrel.f, scales = "fixed", labeller =label_value)
+
+ggplot(lnewdat, aes(x = rcv_voting, y = Probability)) +
+  geom_boxplot(size = .75) +
+  geom_jitter(alpha = .5) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
 ##################
 # RCV Preference #
 ##################
