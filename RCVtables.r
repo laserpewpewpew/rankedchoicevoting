@@ -141,39 +141,50 @@ library(stargazer)
 stargazer(olog.pos.base, olog.pos.step1, olog.pos.step2, olog.pos.final,
           title="Ordered Logit of Positive Campaigning", align=TRUE,
           dep.var.labels=c("Ordinal Less Negative Campaigning"),
+          ord.intercepts=TRUE, no.space=TRUE,
+          notes = c("Unstandardized ordered logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(log.pos.base, log.pos.step1, log.pos.step2, log.pos.final,
           title="Logistic Regression of Positive Campaigning", align=TRUE,
-          dep.var.labels=c("Dichotomous Less Negative Campaigning"),
+          dep.var.labels=c("Dichotomous Less Negative Campaigning"),  no.space=TRUE,
+          notes = c("Unstandardized logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(log.fair, log.praise, log.int, olog.info, olog.cand,
-          title="Null and Negative Findings", align=TRUE,
+          title="Null and Negative Findings", align=TRUE,  no.space=TRUE,
+          notes = c("Unstandardized logistic regression coefficients with standard errors in parentheses. Unstandardized ordered logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           dep.var.labels=c("Fairness", "Candidate Praise", "Interesting Election", "Useful Info.", "Candidate Choice Satisfaction"),
-          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "Mayoral Election", "Council Election"))
+          covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mayoral Election", "Council Election"))
 
 stargazer(log.crit.base, log.crit.step1, log.crit.step2, log.crit.final,
           title="Logistic Regression of Less Criticism Between Candidates", align=TRUE,
-          dep.var.labels=c("Dichotomous Less Criticism"),
+          dep.var.labels=c("Dichotomous Less Criticism"),  no.space=TRUE,
+          notes = c("Unstandardized logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(olog.crit.base, olog.crit.step1,olog.crit.step2, olog.crit.final, 
           title="Ordered Logit of Less Criticism Between Candidates", align=TRUE,
           dep.var.labels=c("Ordinal Less Criticism"),
+          ord.intercepts=TRUE,  no.space=TRUE,
+          notes = c("Unstandardized ordered logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(log.sat.base, log.sat.step1, log.sat.step2, log.sat.final, 
           title="Logistic Regression of Satisfaction with Conduct of Campaigns", align=TRUE,
-          dep.var.labels=c("Dichotomous Satisfaction"),
+          dep.var.labels=c("Dichotomous Satisfaction"),  no.space=TRUE,
+          notes = c("Unstandardized logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(olog.sat.base, olog.sat.step1, olog.sat.step2, olog.sat.final, 
           title="Ordered Logit of Satisfaction with Conduct of Campaigns", align=TRUE,
           dep.var.labels=c("Ordinal Satisfaction"),
+          notes = c("Unstandardized ordered logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
+          ord.intercepts=TRUE,  no.space=TRUE,
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(log.pref.base, log.pref.step1, log.pref.step2, log.pref.final, 
           title="Logistic Regression of Preference for RCV System", align=TRUE,
-          dep.var.labels=c("Use RCV In Other Cities"),
+          dep.var.labels=c("Use RCV In Other Cities"),  no.space=TRUE,
+          notes = c("Unstandardized logistic regression coefficients with standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
