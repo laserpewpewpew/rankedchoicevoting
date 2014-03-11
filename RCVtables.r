@@ -131,7 +131,7 @@ log.int <- glm(interesting ~ rcv_voting + newwhite + age + newedu + employed + m
 
 # ordered logit
 olog.info <- polr(useful_information.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, Hess = TRUE)
-olog.cand <- polr(candidate_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mayor_vote + council_vote, data=mydata, Hess = TRUE)
+olog.cand <- polr(candidate_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mayor_vote, data=mydata, Hess = TRUE)
 
 # logit candidate choice satisfaction
 mydata$cand_sat_logit[mydata$candidate_satisfaction.f=="Not at all satisfied"] <- 0
