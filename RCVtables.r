@@ -55,10 +55,10 @@ mydata$logit_positive[mydata$positive_campaigning==4] <- 1
 mydata$logit_positive[mydata$positive_campaigning==5] <- 1
 
 # logit
-log.pos.base <- glm(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
-log.pos.step1 <- glm(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
-log.pos.step2 <- glm(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
-log.pos.final <- glm(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+log.pos.base <- robustbase::glmrob(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.pos.step1 <- robustbase::glmrob(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.pos.step2 <- robustbase::glmrob(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.pos.final <- robustbase::glmrob(logit_positive ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
 # ordered logit
 olog.pos.base <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
@@ -71,10 +71,10 @@ olog.pos.final <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + ne
 ##################
 
 # logit
-log.pref.base <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
-log.pref.step1 <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
-log.pref.step2 <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
-log.pref.final <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+log.pref.base <- robustbase::glmrob(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.pref.step1 <- robustbase::glmrob(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.pref.step2 <- robustbase::glmrob(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.pref.final <- robustbase::glmrob(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
 ##################
 # Less Criticism #
@@ -82,10 +82,10 @@ log.pref.final <- glm(rcv_pref ~ rcv_voting + newwhite + age + newedu + employed
 mydata$ocrit.f <- factor(mydata$ocrit, labels=c("A great deal of time", "Some of the time", "Don't know", "Not too much", "Not at all"))
 
 # logit
-log.crit.base <- glm(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
-log.crit.step1 <- glm(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
-log.crit.step2 <- glm(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
-log.crit.final <- glm(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+log.crit.base <- robustbase::glmrob(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.crit.step1 <- robustbase::glmrob(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.crit.step2 <- robustbase::glmrob(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.crit.final <- robustbase::glmrob(no_criticize ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
 # ordered logit
 olog.crit.base <- polr(ocrit.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
@@ -97,7 +97,7 @@ olog.crit.final <- polr(ocrit.f ~ rcv_voting + newwhite + age + newedu + employe
 # Campaign Satisfaction #
 #########################
 
-mydata$campaign_satisfaction.f <- factor(mydata$campaign_satisfaction, labels=c("Not at all satisfied", "Not very satisfied", "No opinion/Don't know", "Fairly satisfied", "Very satisfied"))
+mydata$campaign_satisfaction.f <- factor(mydata$campaign_satisfaction, labels=c("Not at all satisfied", "Not very satisfied", "Don't know", "Fairly satisfied", "Very satisfied"))
 mydata$logit_satisfied[mydata$campaign_satisfaction==1] <- 0
 mydata$logit_satisfied[mydata$campaign_satisfaction==2] <- 0
 mydata$logit_satisfied[mydata$campaign_satisfaction==3] <- 0
@@ -105,10 +105,10 @@ mydata$logit_satisfied[mydata$campaign_satisfaction==4] <- 1
 mydata$logit_satisfied[mydata$campaign_satisfaction==5] <- 1
 
 # logit
-log.sat.base <- glm(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
-log.sat.step1 <- glm(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
-log.sat.step2 <- glm(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
-log.sat.final <- glm(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+log.sat.base <- robustbase::glmrob(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.sat.step1 <- robustbase::glmrob(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.sat.step2 <- robustbase::glmrob(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.sat.final <- robustbase::glmrob(logit_satisfied ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
 # ordered logit
 olog.sat.base <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
@@ -120,18 +120,38 @@ olog.sat.final <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + n
 # Null Findings #
 #################
 
-mydata$useful_information.f <- factor(mydata$useful_information, labels=c("No useful information", "Not too much information", "No opinion/Don't know", "Some information", "A great deal of useful information"))
-mydata$candidate_satisfaction.f <- factor(mydata$candidate_satisfaction, labels=c("Not at all satisfied", "Not very satisfied", "No opinion/Don't know", "Fairly satisfied", "Very satisfied"))
+mydata$useful_information.f <- factor(mydata$useful_information, labels=c("No useful information", "Not too much information", "Don't know", "Some information", "A great deal of useful information"))
+mydata$candidate_satisfaction.f <- factor(mydata$candidate_satisfaction, labels=c("Not at all satisfied", "Not very satisfied", "Don't know", "Fairly satisfied", "Very satisfied"))
 
 # logit
-log.fair <- glm(fairness ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
-log.praise <- glm(praise ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
-log.int <- glm(interesting ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.fair <- robustbase::glmrob(fairness ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
 
+log.praise <- robustbase::glmrob(praise ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.int <- robustbase::glmrob(interesting ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
 
 # ordered logit
-olog.info <- polr(useful_information.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
+olog.info <- polr(useful_information.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, Hess = TRUE)
 olog.cand <- polr(candidate_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint + mayor_vote + council_vote, data=mydata, Hess = TRUE)
+
+# logit candidate choice satisfaction
+mydata$cand_sat_logit[mydata$candidate_satisfaction.f=="Not at all satisfied"] <- 0
+mydata$cand_sat_logit[mydata$candidate_satisfaction.f=="Not very satisfied"] <- 0
+mydata$cand_sat_logit[mydata$candidate_satisfaction.f=="Don't know"] <- 0
+mydata$cand_sat_logit[mydata$candidate_satisfaction.f=="Fairly satisfied"] <- 1
+mydata$cand_sat_logit[mydata$candidate_satisfaction.f=="Very satisfied"] <- 1
+
+# robust logit summaries
+summary(log.pos.final)
+summary(log.pref.final)
+summary(log.crit.final)
+summary(log.sat.final)
+summary(log.fair)
+summary(log.praise)
+summary(log.int)
+
+
+olog.rerun.cand <- polr(candidate_satisfaction.f ~ rcv_voting + newwhite + age + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, Hess = TRUE)
+summary(olog.rerun.cand)
 
 #######################
 # Create LaTeX Tables #
