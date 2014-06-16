@@ -13,6 +13,10 @@ library(ggplot2)
 library(MASS)
 library(Hmisc)
 library(reshape2)
+library(rms)
+library(apsrtable)
+library(robustbase)
+library(sandwich)
 
 # housekeeping recodes
 mydata$newedu[mydata$education=="incomplete"] <- 1
@@ -28,6 +32,18 @@ mydata$polint[mydata$q26=="Hardly at all?"] <- 1
 mydata$polint[mydata$q26=="Only now and then, or"] <- 2
 mydata$polint[mydata$q26=="Some of the time"] <- 3
 mydata$polint[mydata$q26=="Most of the time"] <- 4
+
+mydata$mobilization[mydata$q22=="No"] <- 0
+mydata$mobilization[mydata$q22=="Yes"] <- 1
+mydata$mobilization[mydata$q22=="Dont know [VOL]"] <- NA
+mydata$mobilization[mydata$q22=="Refused [VOL]"] <- NA
+
+mydata$city_satisfaction[mydata$q27=="Very satisfied"] <- 3
+mydata$city_satisfaction[mydata$q27=="Fairly satisfied"] <- 2
+mydata$city_satisfaction[mydata$q27=="Not very satisfied"] <- 1
+mydata$city_satisfaction[mydata$q27=="Not at all satisfied"] <- 0
+mydata$city_satisfaction[mydata$q27=="No opinion_DK"] <- NA
+mydata$city_satisfaction[mydata$q27=="Refused"] <- NA
 
 ########################
 # Positive Campaigning #
@@ -100,11 +116,49 @@ log.pos.step1 <- glm(logit_positive.n ~ rcv_voting + newwhite + age + male  + ne
 log.pos.step2 <- glm(logit_positive.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
 log.pos.final <- glm(logit_positive.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
+log.pos.base$se<-vcovHC(log.pos.base, type="HC1")
+log.pos.step1$se<-vcovHC(log.pos.step1, type="HC1")
+log.pos.step2$se<-vcovHC(log.pos.step2, type="HC1")
+log.pos.final$se<-vcovHC(log.pos.final, type="HC1")
+
+
+# robust se check
+log.pos.base.r <- glmrob(logit_positive.n ~ rcv_voting + newwhite + age + male + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.pos.step1.r <- glmrob(logit_positive.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.pos.step2.r <- glmrob(logit_positive.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.pos.final.r <- glmrob(logit_positive.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+lpos.base.r.sum <- summary(log.pos.base.r)
+lpos.step1.r.sum <- summary(log.pos.step1.r)
+lpos.step2.r.sum <- summary(log.pos.step2.r)
+lpos.final.r.sum <- summary(log.pos.final.r)
+
 # ordered logit
 olog.pos.base <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
 olog.pos.step1 <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, Hess = TRUE)
 olog.pos.step2 <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, Hess = TRUE)
 olog.pos.final <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, Hess = TRUE)
+
+# robust se check
+olog.pos.base.r <- glmrob(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+olog.pos.step1.r <- glmrob(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+olog.pos.step2.r <- glmrob(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+olog.pos.final.r <- glmrob(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+pos.base.r.sum <- summary(olog.pos.base.r)
+pos.step1.r.sum <- summary(olog.pos.step1.r)
+pos.step2.r.sum <- summary(olog.pos.step2.r)
+pos.final.r.sum <- summary(olog.pos.final.r)
+
+olog.pos.base <- glm(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+olog.pos.step1 <- glm(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+olog.pos.step2 <- glm(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+olog.pos.final <- glm(positive_campaigning.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+olog.pos.base$se<-vcovHC(olog.pos.base, type="HC1")
+olog.pos.step1$se<-vcovHC(olog.pos.step1, type="HC1")
+olog.pos.step2$se<-vcovHC(olog.pos.step2, type="HC1")
+olog.pos.final$se<-vcovHC(olog.pos.final, type="HC1")
 
 ##################
 # RCV Preference #
@@ -127,11 +181,50 @@ log.crit.step1 <- glm(no_criticize.n ~ rcv_voting + newwhite + age + male  + new
 log.crit.step2 <- glm(no_criticize.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
 log.crit.final <- glm(no_criticize.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
+log.crit.base$se<-vcovHC(log.crit.base, type="HC1")
+log.crit.step1$se<-vcovHC(log.crit.step1, type="HC1")
+log.crit.step2$se<-vcovHC(log.crit.step2, type="HC1")
+log.crit.final$se<-vcovHC(log.crit.final, type="HC1")
+
+
+# robust se check
+log.crit.base.r <- glmrob(no_criticize.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.crit.step1.r <- glmrob(no_criticize.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.crit.step2.r <- glmrob(no_criticize.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.crit.final.r <- glmrob(no_criticize.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+log.crit.base.r.sum <- summary(log.crit.base.r)
+log.crit.step1.r.sum <- summary(log.crit.step1.r)
+log.crit.step2.r.sum <- summary(log.crit.step2.r)
+log.crit.final.r.sum <- summary(log.crit.final.r)
+
 # ordered logit
 olog.crit.base <- polr(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
 olog.crit.step1 <- polr(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, Hess = TRUE)
 olog.crit.step2 <- polr(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, Hess = TRUE)
 olog.crit.final <- polr(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, Hess = TRUE)
+
+# robust se check
+olog.crit.base.r <- glmrob(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+olog.crit.step1.r <- glmrob(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+olog.crit.step2.r <- glmrob(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+olog.crit.final.r <- glmrob(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+crit.base.r.sum <- summary(olog.crit.base.r)
+crit.step1.r.sum <- summary(olog.crit.step1.r)
+crit.step2.r.sum <- summary(olog.crit.step2.r)
+crit.final.r.sum <- summary(olog.crit.final.r)
+
+olog.crit.base <- glm(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+olog.crit.step1 <- glm(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+olog.crit.step2 <- glm(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+olog.crit.final <- glm(ocrit.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+olog.crit.base$se<-vcovHC(olog.crit.base, type="HC1")
+olog.crit.step1$se<-vcovHC(olog.crit.step1, type="HC1")
+olog.crit.step2$se<-vcovHC(olog.crit.step2, type="HC1")
+olog.crit.final$se<-vcovHC(olog.crit.final, type="HC1")
+
 
 #########################
 # Campaign Satisfaction #
@@ -158,11 +251,53 @@ log.sat.step1 <- glm(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + n
 log.sat.step2 <- glm(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
 log.sat.final <- glm(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
 
+log.sat.base$se<-vcovHC(log.sat.base, type="HC1")
+log.sat.step1$se<-vcovHC(log.sat.step1, type="HC1")
+log.sat.step2$se<-vcovHC(log.sat.step2, type="HC1")
+log.sat.final$se<-vcovHC(log.sat.final, type="HC1")
+
+
+# robust se check
+log.sat.base.r <- glmrob(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+log.sat.step1.r <- glmrob(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+log.sat.step2.r <- glmrob(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+log.sat.final.r <- glmrob(logit_satisfied.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+log.sat.base.r.sum <- summary(log.sat.base.r)
+log.sat.step1.r.sum <- summary(log.sat.step1.r)
+log.sat.step2.r.sum <- summary(log.sat.step2.r)
+log.sat.final.r.sum <- summary(log.sat.final.r)
+
 # ordered logit
 olog.sat.base <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, Hess = TRUE)
 olog.sat.step1 <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, Hess = TRUE)
 olog.sat.step2 <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, Hess = TRUE)
 olog.sat.final <- polr(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, Hess = TRUE)
+
+olog.sat.base <- glm(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+olog.sat.step1 <- glm(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+olog.sat.step2 <- glm(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+olog.sat.final <- glm(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+olog.sat.base$se<-vcovHC(olog.sat.base, type="HC1")
+olog.sat.step1$se<-vcovHC(olog.sat.step1, type="HC1")
+olog.sat.step2$se<-vcovHC(olog.sat.step2, type="HC1")
+olog.sat.final$se<-vcovHC(olog.sat.final, type="HC1")
+
+
+# robust se check
+olog.sat.base.r <- glmrob(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner, data=mydata, family="binomial")
+olog.sat.step1.r <- glmrob(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint, data=mydata, family="binomial")
+olog.sat.step2.r <- glmrob(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization, data=mydata, family="binomial")
+olog.sat.final.r <- glmrob(campaign_satisfaction.f ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + electoral_winner + polint + mobilization + city_satisfaction, data=mydata, family="binomial")
+
+olog.sat.base.r.sum <- summary(olog.sat.base.r)
+olog.sat.step1.r.sum <- summary(olog.sat.step1.r)
+olog.sat.step2.r.sum <- summary(olog.sat.step2.r)
+olog.sat.final.r.sum <- summary(olog.sat.final.r)
+
+
+
 
 #################
 # Null Findings #
@@ -215,17 +350,17 @@ reg.cand <- lm(satall ~ rcv_voting + newwhite + age + male  + newedu + employed 
 # Create LaTeX Tables #
 #######################
 library(stargazer)
-
 stargazer(olog.pos.base, olog.pos.step1, olog.pos.step2, olog.pos.final,
-          title="Ordered Logit of Positive Campaigning", align=TRUE,
-          dep.var.labels=c("Ordinal Less Negative Campaigning"),
+          title="Voter Perceptions of Campaign Negativity: Ordered Logit Estimates", align=TRUE,
+          dep.var.labels=c("Negative Campaigning, 1 = a lot more, 5 = a lot less"),
+          se = c(olog.pos.base$se, olog.pos.step1$se, olog.pos.step2$se,olog.pos.final$se),
           ord.intercepts=TRUE, no.space=TRUE,
           notes = c("Unstandardized ordered logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(log.pos.base, log.pos.step1, log.pos.step2, log.pos.final,
-          title="Logistic Regression of Positive Campaigning", align=TRUE,
-          dep.var.labels=c("Dichotomous Less Negative Campaigning"),  no.space=TRUE,
+          title="Voter Perceptions of Campaign Negativity: Logit Estimates", align=TRUE,
+          dep.var.labels=c("Negative Campaigning, 1 = less, 0 = other"),  no.space=TRUE,
           notes = c("Unstandardized logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
@@ -235,37 +370,104 @@ stargazer(log.fair, log.praise, log.int, olog.info, reg.cand,
           dep.var.labels=c("Fairness", "Candidate Praise", "Interesting Election", "Useful Info.", "Candidate Choice Satisfaction"),
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mayoral Election", "Mobilization"))
 
-stargazer(log.crit.base, log.crit.step1, log.crit.step2, log.crit.final,
-          title="Logistic Regression of Less Criticism Between Candidates", align=TRUE,
-          dep.var.labels=c("Dichotomous Less Criticism"),  no.space=TRUE,
-          notes = c("Unstandardized logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
-          covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
-
 stargazer(olog.crit.base, olog.crit.step1,olog.crit.step2, olog.crit.final, 
-          title="Ordered Logit of Less Criticism Between Candidates", align=TRUE,
-          dep.var.labels=c("Ordinal Less Criticism"),
+          title="Voter Perceptions of Candidates Criticizing: Ordered Logit Estimates", align=TRUE,
+          dep.var.labels=c("1 = not at all, 4 = a great deal of the time"),
           ord.intercepts=TRUE,  no.space=TRUE,
+          keep.stat=c("ll","n","aic"),
           notes = c("Unstandardized ordered logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
-stargazer(log.sat.base, log.sat.step1, log.sat.step2, log.sat.final, 
-          title="Logistic Regression of Satisfaction with Conduct of Campaigns", align=TRUE,
-          dep.var.labels=c("Dichotomous Satisfaction"),  no.space=TRUE,
+stargazer(log.crit.base, log.crit.step1, log.crit.step2, log.crit.final,
+          title="Voter Perceptions of Candidates Criticizing: Logit Estimates", align=TRUE,
+          dep.var.labels=c("1 = criticizing, 0 = other"),  no.space=TRUE,
           notes = c("Unstandardized logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
 
 stargazer(olog.sat.base, olog.sat.step1, olog.sat.step2, olog.sat.final, 
-          title="Ordered Logit of Satisfaction with Conduct of Campaigns", align=TRUE,
-          dep.var.labels=c("Ordinal Satisfaction"),
+          title="Voter Satisfaction with Overall Conduct of Local Campaigns: Ordered Logit Estimates", align=TRUE,
+          dep.var.labels=c("Voter Satisfaction, 1 = not at all, 4 = very"),
           notes = c("Unstandardized ordered logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
           ord.intercepts=TRUE,  no.space=TRUE,
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
+
+stargazer(log.sat.base, log.sat.step1, log.sat.step2, log.sat.final, 
+          title="Voter Satisfaction with Overall Conduct of Local Campaigns: Logit Estimates", align=TRUE,
+          dep.var.labels=c("Voter Satisfaction, 1 = satisfied, 0 = other"),  no.space=TRUE,
+          notes = c("Unstandardized logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
+          covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
+
+
+
 
 stargazer(log.pref.base, log.pref.step1, log.pref.step2, log.pref.final, 
           title="Logistic Regression of Preference for RCV System", align=TRUE,
           dep.var.labels=c("Use RCV In Other Cities"),  no.space=TRUE,
           notes = c("Unstandardized logistic regression coefficients with robust standard errors in parentheses. Significance levels based on two-tailed tests."),
           covariate.labels=c("RCV", "White", "Age", "Male", "Education", "Employed", "Married", "Democrat", "Republican", "Electoral Winner", "Political Interest", "Mobilization", "City Satisfaction"))
+
+
+# tables using robust standard errors
+
+apsrtable(olog.pos.base, olog.pos.step1, olog.pos.step2, olog.pos.final,
+  se=c("robust"),align=c("center"),
+  digits=2, coef.names=c("Intercept","RCV","White","Age","Male",
+                         "Education","Employed","Married","Democrat",
+                         "Republican","Electoral Winner","Political Interest",
+                         "Mobilization","City Satisfaction"),
+  caption=c("Voter Perceptions of Campaign Negativity: Ordered Logit Estimates"),
+  notes=list("Unstandardized ordered logistic regression coefficients with robust standard errors in parantheses.", "Significance levels based on two-tailed tests.", stars.note)
+  )
+
+apsrtable(log.pos.base, log.pos.step1, log.pos.step2, log.pos.final,
+          se=c("robust"),align=c("center"),
+          digits=2, coef.names=c("Intercept","RCV","White","Age","Male",
+                                 "Education","Employed","Married","Democrat",
+                                 "Republican","Electoral Winner","Political Interest",
+                                 "Mobilization","City Satisfaction"),
+          caption=c("Voter Perceptions of Campaign Negativity: Logit Estimates"),
+          notes=list("Unstandardized logistic regression coefficients with robust standard errors in parantheses.", "Significance levels based on two-tailed tests.", stars.note)
+)
+
+apsrtable(olog.crit.base, olog.crit.step1, olog.crit.step2, olog.crit.final,
+          se=c("robust"),align=c("center"),
+          digits=2, coef.names=c("Intercept","RCV","White","Age","Male",
+                                 "Education","Employed","Married","Democrat",
+                                 "Republican","Electoral Winner","Political Interest",
+                                 "Mobilization","City Satisfaction"),
+          caption=c("Voter Perceptions of Candidates Criticizing: Ordered Logit Estimates"),
+          notes=list("Unstandardized ordered logistic regression coefficients with robust standard errors in parantheses.", "Significance levels based on two-tailed tests.", stars.note)
+)
+
+apsrtable(log.crit.base, log.crit.step1, log.crit.step2, log.crit.final,
+          se=c("robust"),align=c("center"),
+          digits=2, coef.names=c("Intercept","RCV","White","Age","Male",
+                                 "Education","Employed","Married","Democrat",
+                                 "Republican","Electoral Winner","Political Interest",
+                                 "Mobilization","City Satisfaction"),
+          caption=c("Voter Perceptions of Candidates Criticizing: Logit Estimates"),
+          notes=list("Unstandardized logistic regression coefficients with robust standard errors in parantheses.", "Significance levels based on two-tailed tests.", stars.note)
+)
+
+apsrtable(olog.sat.base, olog.sat.step1, olog.sat.step2, olog.sat.final,
+          se=c("robust"),align=c("center"),
+          digits=2, coef.names=c("Intercept","RCV","White","Age","Male",
+                                 "Education","Employed","Married","Democrat",
+                                 "Republican","Electoral Winner","Political Interest",
+                                 "Mobilization","City Satisfaction"),
+          caption=c("Voter Satisfaction with Overall Conduct of Local Campaigns: Ordered Logit Estimates"),
+          notes=list("Unstandardized ordered logistic regression coefficients with robust standard errors in parantheses.", "Significance levels based on two-tailed tests.", stars.note)
+)
+
+apsrtable(log.sat.base, log.sat.step1, log.sat.step2, log.sat.final,
+          se=c("robust"),align=c("center"),
+          digits=2, coef.names=c("Intercept","RCV","White","Age","Male",
+                                 "Education","Employed","Married","Democrat",
+                                 "Republican","Electoral Winner","Political Interest",
+                                 "Mobilization","City Satisfaction"),
+          caption=c("Voter Satisfaction with Overall Conduct of Local Campaigns: Logit Estimates"),
+          notes=list("Unstandardized logistic regression coefficients with robust standard errors in parantheses.", "Significance levels based on two-tailed tests.", stars.note)
+)
 
 ################
 # Jack-knifing #
@@ -316,6 +518,10 @@ olog.nocedarrapids <- polr(positive_campaigning.f ~ rcv_voting + newwhite + age 
                              electoral_winner + polint + mobilization + city_satisfaction, 
                            data=data.nocedarrapids, Hess = TRUE)
 
+pr <- profile(olog.nocedarrapids)
+plot(pr)
+pairs(pr)
+
 require(stargazer)
 stargazer(olog.nolowell, olog.noworc, olog.noboston, 
           olog.noseattle, olog.nodesmoines, 
@@ -323,25 +529,51 @@ stargazer(olog.nolowell, olog.noworc, olog.noboston,
           title="Voter Perceptions of Campaign Negativity: Ordered Logit Estimates",
           align=TRUE, no.space=TRUE,
           covariate.labels=c("RCV","White","Age","Male",
-                             "Education","Employed","Maried",
+                             "Education","Employed","Married",
                              "Democrat","Republican","Electoral Winner",
                              "Political Interest","Mobilization","City Satisfaction"),
           notes = c("Unstandardized ordered logistic regression coefficients with robust standard errors in parentheses.","Significance levels based on two-tailed tests"))
 
 
 # CEM
-cem.dat <- mydata[c(87,108,130,131,99,100,101,102,97,98,119,132,109,90)]
-cem.data <- cem.dat[!is.na(cem.dat$positive_campaigning.f),]
+cem.dat <- mydata[c(87,131,99,100,130,101,102,97,98,119,132,109,90,134)]
+cem.data <- cem.dat[!is.na(cem.dat$logit_positive.n),]
+Le <-data.frame(na.omit(cem.data))
 
 require(cem)
-vars <- c("newwhite","age","male","newedu","employed",
-          "married","democrat","republican","electoral_winner",
-          "polint","mobilization","city_satisfaction")
-imbalance(group=mydata$rcv_voting, data=mydata[vars])
+vars <- c("age","newedu","newwhite","male","employed","democrat","republican")
+imbalance(group=Le$rcv_voting, data=Le[vars])
 
-mat <- cem(treatment = "rcv_voting", data=mydata, drop="positive_campaigning")
+mat <- cem(treatment = "rcv_voting", data=Le)
+
+q1.grp <- list(c("CAMBRIDGE","LOWELL","WORCESTER"), c("MINNEAPOLIS","BOSTON","SEATTLE","TULSA"), c("ST. PAUL","CEDAR RAPIDS","DES MOINES"))
+
+mat1 <- cem(treatment = "rcv_voting", data = Le, drop = "logit_positive.n",
+            keep.all=TRUE, grouping = q1.grp)
 
 # automated progressive coarsening
-tab <- relax.cem(mat, cem.data, depth=1, perc=0.3)
-est <- att(mat, positive_campaigning ~ rcv_voting, data=mydata)
+tab <- relax.cem(mat1, mydata, depth=3, perc=0.3)
+est <- att (mat1, logit_positive.n ~ rcv_voting + newwhite + age + male  + 
+              newedu + employed + married + democrat + republican + 
+              electoral_winner + polint + mobilization + city_satisfaction, 
+            data=Le, model="logit")
 
+# CEM with only demographics:
+require(cem)
+cem.dat.dem <- mydata[c(87,131,99,100,130,101,102,97,98,132,134)]
+cem.data.dem <- cem.dat.dem[!is.na(cem.dat.dem$logit_positive.n),]
+cemdem <-data.frame(na.omit(cem.data.dem))
+vars <- c("age","newedu","newwhite","male","employed","democrat","republican")
+imbalance(group=cemdem$rcv_voting, data=cemdem[vars])
+
+q1.grp <- list(c("CAMBRIDGE","LOWELL","WORCESTER"), c("MINNEAPOLIS","BOSTON","SEATTLE","TULSA"), 
+               c("ST. PAUL","CEDAR RAPIDS","DES MOINES"))
+
+mat.dem <- cem(treatment = "rcv_voting", data = cemdem, drop = "logit_positive.n",
+            keep.all=TRUE, grouping = q1.grp)
+est <- att (mat.dem, logit_positive.n ~ rcv_voting + newwhite + age + male  + newedu + employed + married + democrat + republican + polint, data=cemdem, model="logit")
+
+###
+# 1) .pdf of G. King document on CEM
+# 2) code w/ results (imbalance and SATT)
+# 
